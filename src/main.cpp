@@ -1,6 +1,5 @@
 #include <iostream>
 #include <bits/stdc++.h>
-#include <algorithm>
 
 using namespace std;
 
@@ -27,7 +26,6 @@ int main() {
             std::stringstream ss(line);
             string p, ocr;
             ss >> p >> ocr >> n0 >> n1 >> m;
-            //cout << n0 << n1 << m;
             break;
         }
     }
@@ -43,7 +41,6 @@ int main() {
     // Barycenter heuristic
     pair<int, double> averagePosition[N];
     for (int i = n0 + 1 ; i <= n0 + n1; i++) {
-        //cout << "i " << i << endl; 
         double sum = 0;
         int count = 0;
         
@@ -51,7 +48,6 @@ int main() {
             sum += neighbor;
             count++;
         }
-        // cout << sum / count << endl;
         
         averagePosition[i] = make_pair(i, sum / count);
     }
