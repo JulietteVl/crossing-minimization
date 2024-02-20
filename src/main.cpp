@@ -15,7 +15,6 @@ bool compareAverage(const pair<int, double> &a, const pair<int, double> &b)
 int main(int argc, char **argv)
 {
     // Check and process arguments
-    cout << "Hello " << argc;
     if (argc < 3)
     {
         std::cout << "Usage: " << argv[0] << " <input_file_path> <output_file_path>\n";

@@ -1,4 +1,9 @@
 build/*
 *.out
+*.gr
 sol/*
 .vscode
+*.sh
+pace_env/
+src/.ipynb_checkpoints/*
+visualizer.py
