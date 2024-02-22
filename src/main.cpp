@@ -32,8 +32,9 @@ int main(int argc, char **argv)
         cout << "Failed to open the input file." << endl;
     }
     string line;
-    int n0, n1, m, x, y;
-    vector<int> adj[N];
+    int n0, n1, m, u, v;
+    pair<int, int> *edges = new pair<int, int> [m];
+    int *offset = new int[n0 + n1];
 
     while (getline(input_file, line))
     {
@@ -55,12 +56,17 @@ int main(int argc, char **argv)
         else
         {
             // Read the edges
+            int j = 0;  // offset array index. There will be nothing at 0 because the nodes are 1-indexed.
             for (int i = 0; i < m; i++)
             {
+                // assumes that u are in order as in the instances.
                 istringstream iss(line);
-                iss >> x >> y;
-                adj[x].push_back(y);
-                adj[y].push_back(x);
+                iss >> u >> v;
+                edges[m] = make_pair(u, v);
+                while (j < u){
+                    offset[j] = i;
+                    j++;
+                }
             }
         }
     }
@@ -73,7 +79,7 @@ int main(int argc, char **argv)
         double sum = 0;
         int count = 0;
 
-        for (int neighbor : adj[i])
+        for (int neighbor = edges[offset[i]].second; neighbor < edges[offset[i]].second; i++)
         {
             sum += neighbor;
             count++;
@@ -98,6 +104,6 @@ int main(int argc, char **argv)
     }
 
     output_file.close();
-
+    delete[] edges;
     return 0;
 }
