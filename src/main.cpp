@@ -3,14 +3,9 @@
 #include <sstream>
 #include <bits/stdc++.h>
 
+#include "library.h"
+
 using namespace std;
-
-const int N = 100;
-
-bool compareAverage(const pair<int, double> &a, const pair<int, double> &b)
-{
-    return a.second < b.second;
-}
 
 int main(int argc, char **argv)
 {
@@ -32,9 +27,11 @@ int main(int argc, char **argv)
         cout << "Failed to open the input file." << endl;
     }
     string line;
-    int n0, n1, m, x, y;
-    vector<int> adj[N];
+    int n0, n1, m, u, v;
+    int *offset;
+    pair<int, int> *edges;
 
+    int i = 0;
     while (getline(input_file, line))
     {
         // Skip comment lines
@@ -49,40 +46,64 @@ int main(int argc, char **argv)
             std::stringstream ss(line);
             string p, ocr;
             ss >> p >> ocr >> n0 >> n1 >> m;
-            break;
+            edges = new pair<int, int> [2 * m];
+            offset = new int[n0 + n1 + 2];
         }
 
         else
         {
             // Read the edges
-            for (int i = 0; i < m; i++)
-            {
-                istringstream iss(line);
-                iss >> x >> y;
-                adj[x].push_back(y);
-                adj[y].push_back(x);
-            }
+            // TODO should I check for comments in the middle?
+            istringstream iss(line);
+            iss >> u >> v;
+            edges[i++] = make_pair(u, v);
+            edges[i++] = make_pair(v, u);
         }
     }
 
+    sort(edges, edges + 2 * m, compare_first);
+    int j = 0;  // offset array index. There will be nothing at 0 because the nodes are 1-indexed.
+    for (int i = 0; i < 2 * m; i++)
+    {
+        u = edges[i].first;
+        while (j < u){
+            offset[++j] = i;
+        }
+    }
+    offset[j + 1] = 2 * m;
+
+    // cout << "sorted edges:" << endl;
+    // for (int i = 0; i < 2 * m; i++){
+    //     cout << edges[i].first << ' ' << edges[i].second << endl;
+    // }
+
+    // cout << endl;
+
+    cout << "offset array:" << endl;
+    for (int i = 1; i <= n0 + n1 + 1; i++){
+        cout << offset[i] << " ";
+    }
+
+    // cout << endl;
+
     // Apply some algorithm to the input
     // Barycenter heuristic
-    pair<int, double> averagePosition[N];
-    for (int i = n0 + 1; i <= n0 + n1; i++)
+    pair<int, double>* average_position = new pair<int, double> [n1 + 1];
+    for (int i = n0 + 1; i <= n0; i++)
     {
         double sum = 0;
         int count = 0;
 
-        for (int neighbor : adj[i])
+        for (int j = offset[i]; j < offset[j + 1]; i++)
         {
-            sum += neighbor;
+            sum += edges[j].second;
             count++;
         }
-
-        averagePosition[i] = make_pair(i, sum / count);
+        if (count > 0) average_position[i] = make_pair(i, sum / count);
+        else average_position[i] = make_pair(i, 0);
     }
 
-    sort(averagePosition + n0, averagePosition + n0 + n1, compareAverage);
+    sort(average_position + n0, average_position + n0, compare_second);
 
     // Output
     ofstream output_file(output_name);
@@ -94,10 +115,12 @@ int main(int argc, char **argv)
 
     for (int i = n0 + 1; i <= n0 + n1; i++)
     {
-        output_file << averagePosition[i].first << endl;
+        output_file << average_position[i].first << endl;
     }
 
     output_file.close();
 
+    delete[] offset;
+    delete[] edges;
     return 0;
 }
