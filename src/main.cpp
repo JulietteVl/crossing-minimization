@@ -79,31 +79,37 @@ int main(int argc, char **argv)
 
     // cout << endl;
 
-    cout << "offset array:" << endl;
-    for (int i = 1; i <= n0 + n1 + 1; i++){
-        cout << offset[i] << " ";
-    }
+    // cout << "offset array:" << endl;
+    // for (int i = 1; i <= n0 + n1 + 1; i++){
+    //     cout << offset[i] << " ";
+    // }
 
     // cout << endl;
 
     // Apply some algorithm to the input
     // Barycenter heuristic
     pair<int, double>* average_position = new pair<int, double> [n1 + 1];
-    for (int i = n0 + 1; i <= n0; i++)
+    for (int i = n0 + 1; i <= n0 + n1; i++)
     {
         double sum = 0;
         int count = 0;
 
-        for (int j = offset[i]; j < offset[j + 1]; i++)
+        for (int j = offset[i]; j < offset[i + 1]; j++)
         {
             sum += edges[j].second;
             count++;
         }
-        if (count > 0) average_position[i] = make_pair(i, sum / count);
-        else average_position[i] = make_pair(i, 0);
+        if (count > 0) average_position[i - n0 - 1] = make_pair(i, sum / count);
+        else average_position[i - n0 - 1] = make_pair(i, 0);
     }
 
-    sort(average_position + n0, average_position + n0, compare_second);
+    // cout << "average position:" << endl;
+    // for (int i = 0; i < n1; i++){
+    //     cout << average_position[i].first << " " << average_position[i].second << endl;
+    // }
+    // sort(average_position, average_position + n1, compare_second);
+
+
 
     // Output
     ofstream output_file(output_name);
@@ -113,7 +119,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    for (int i = n0 + 1; i <= n0 + n1; i++)
+    for (int i = 0; i < n1; i++)
     {
         output_file << average_position[i].first << endl;
     }
