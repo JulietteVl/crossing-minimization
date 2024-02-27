@@ -72,44 +72,27 @@ int main(int argc, char **argv)
     }
     offset[j + 1] = 2 * m;
 
-    // cout << "sorted edges:" << endl;
-    // for (int i = 0; i < 2 * m; i++){
-    //     cout << edges[i].first << ' ' << edges[i].second << endl;
-    // }
-
-    // cout << endl;
-
-    // cout << "offset array:" << endl;
-    // for (int i = 1; i <= n0 + n1 + 1; i++){
-    //     cout << offset[i] << " ";
-    // }
-
-    // cout << endl;
-
-    // Apply some algorithm to the input
-    // Barycenter heuristic
-    pair<int, double>* average_position = new pair<int, double> [n1 + 1];
-    for (int i = n0 + 1; i <= n0 + n1; i++)
-    {
-        double sum = 0;
-        int count = 0;
-
-        for (int j = offset[i]; j < offset[i + 1]; j++)
-        {
-            sum += edges[j].second;
-            count++;
+    if (false){
+        // print edges
+        cout << "sorted edges:" << endl;
+        for (int i = 0; i < 2 * m; i++){
+            cout << edges[i].first << ' ' << edges[i].second << endl;
         }
-        if (count > 0) average_position[i - n0 - 1] = make_pair(i, sum / count);
-        else average_position[i - n0 - 1] = make_pair(i, 0);
+         cout << endl;
     }
 
-    // cout << "average position:" << endl;
-    // for (int i = 0; i < n1; i++){
-    //     cout << average_position[i].first << " " << average_position[i].second << endl;
-    // }
-    // sort(average_position, average_position + n1, compare_second);
+    if (false){
+        // print offset array
+        cout << "offset array:" << endl;
+        for (int i = 1; i <= n0 + n1 + 1; i++){
+            cout << offset[i] << " ";
+        }
 
+        cout << endl;
+    }
 
+    // Apply some algorithm to the input
+    int* order = barycenter_ordering(n0, n1, offset, edges); // array of size n1
 
     // Output
     ofstream output_file(output_name);
@@ -121,7 +104,7 @@ int main(int argc, char **argv)
 
     for (int i = 0; i < n1; i++)
     {
-        output_file << average_position[i].first << endl;
+        output_file << order[i] << endl;
     }
 
     output_file.close();
