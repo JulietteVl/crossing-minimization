@@ -107,7 +107,7 @@ int main(int argc, char **argv)
     // for (int i = 0; i < n1; i++){
     //     cout << average_position[i].first << " " << average_position[i].second << endl;
     // }
-    // sort(average_position, average_position + n1, compare_second);
+    sort(average_position, average_position + n1, compare_second);
 
 
 
