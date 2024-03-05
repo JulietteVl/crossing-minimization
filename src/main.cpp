@@ -7,7 +7,15 @@
 
 using namespace std;
 
+int pipeline(int argc, char **argv);
+
 int main(int argc, char **argv)
+{
+    pipeline(argc, argv);
+    return 0;
+}
+
+int pipeline(int argc, char **argv)
 {
     // Check and process arguments
     if (argc < 3)
@@ -28,10 +36,9 @@ int main(int argc, char **argv)
     }
     string line;
     int n0, n1, m, u, v;
-    int *offset;
-    pair<int, int> *edges;
+    vector<int> offset;             // size n0 + n1 + 2 (1-indexed as the nodes and we need 1 more)
+    vector<pair<int, int>> edges;   // size 2m
 
-    int i = 0;
     while (getline(input_file, line))
     {
         // Skip comment lines
@@ -46,8 +53,7 @@ int main(int argc, char **argv)
             std::stringstream ss(line);
             string p, ocr;
             ss >> p >> ocr >> n0 >> n1 >> m;
-            edges = new pair<int, int> [2 * m];
-            offset = new int[n0 + n1 + 2];
+            offset.resize(n0 + n1 + 2, 0);
         }
 
         else
@@ -56,13 +62,13 @@ int main(int argc, char **argv)
             // TODO should I check for comments in the middle?
             istringstream iss(line);
             iss >> u >> v;
-            edges[i++] = make_pair(u, v);
-            edges[i++] = make_pair(v, u);
+            edges.push_back(make_pair(u, v));
+            edges.push_back(make_pair(v, u));
         }
     }
 
-    sort(edges, edges + 2 * m, compare_first);
-    int j = 0;  // offset array index. There will be nothing at 0 because the nodes are 1-indexed.
+    sort(edges.begin(), edges.end(), compare_first);
+    int j = 0;  // offset array index. There will be whatever at 0 because the nodes are 1-indexed.
     for (int i = 0; i < 2 * m; i++)
     {
         u = edges[i].first;
@@ -87,12 +93,11 @@ int main(int argc, char **argv)
         for (int i = 1; i <= n0 + n1 + 1; i++){
             cout << offset[i] << " ";
         }
-
         cout << endl;
     }
 
     // Apply some algorithm to the input
-    int* order = barycenter_ordering(n0, n1, offset, edges); // array of size n1
+    vector<int> order = barycenter_ordering(n0, n1, offset, edges); // array of size n1
 
     // Output
     ofstream output_file(output_name);
@@ -108,8 +113,5 @@ int main(int argc, char **argv)
     }
 
     output_file.close();
-
-    delete[] offset;
-    delete[] edges;
     return 0;
 }
