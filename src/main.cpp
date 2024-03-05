@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <bits/stdc++.h>
+#include <unistd.h>
 
 #include "library.h"
 
@@ -26,6 +27,26 @@ int pipeline(int argc, char **argv)
 
     string input_name = argv[1];
     string output_name = argv[2];
+
+    int opt;
+    bool apply_greedy = false;
+    bool apply_barycenter = false;
+    bool apply_median = false;
+    while ((opt = getopt(argc, argv, "bmg")) != -1) {
+        switch (opt) {
+            case 'b':
+                apply_barycenter = true;
+                break;
+            case 'm':
+                apply_median = true;
+                break;
+            case 'g':
+                apply_greedy = true;
+                break;
+            default:
+                break;
+        }
+    }
 
     // Open input file and get input
     ifstream input_file(input_name);
@@ -67,6 +88,7 @@ int pipeline(int argc, char **argv)
         }
     }
 
+    // Compute offset array
     sort(edges.begin(), edges.end(), compare_first);
     int j = 0;  // offset array index. There will be whatever at 0 because the nodes are 1-indexed.
     for (int i = 0; i < 2 * m; i++)
@@ -97,7 +119,20 @@ int pipeline(int argc, char **argv)
     }
 
     // Apply some algorithm to the input
-    vector<int> order = barycenter_ordering(n0, n1, offset, edges); // array of size n1
+    vector<int> crossings = crosssing_numbers(n0, n1, m, edges);
+    vector<int> order(n1);
+    if (apply_greedy){
+        iota(order.begin(), order.end(), n0 + 1);
+    }
+    if (apply_median){
+        order = median_ordering(n0, n1, offset, edges); // array of size n1
+    }
+    if (apply_barycenter){
+        order = barycenter_ordering(n0, n1, offset, edges); // array of size n1
+    }
+    if (apply_greedy){
+        order = greedy_ordering(n0, n1, order, crossings);
+    }
 
     // Output
     ofstream output_file(output_name);

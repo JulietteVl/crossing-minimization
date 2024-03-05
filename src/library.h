@@ -2,11 +2,58 @@
 
 using namespace std;
 
+vector<int> crosssing_numbers(int n0, int n1, int m, vector<pair<int, int>> edges);
+
 vector<int> barycenter_ordering(int n0, int n1, vector<int> offset, vector<pair<int, int>> edges);
 vector<int> median_ordering(int n0, int n1, vector<int> offset, vector<pair<int, int>> edges);
-vector<int> greedy_ordering(int n0, int n1, vector<int> offset, vector<pair<int, int>> edges);
+vector<int> greedy_ordering(int n0, int n1, vector<int> initial_order, vector<int> crossings);
+
 bool compare_first(const pair<int, double> &a, const pair<int, double> &b);
 bool compare_second(const pair<int, double> &a, const pair<int, double> &b);
+
+
+// quadratic in the number of edges
+vector<int> crosssing_numbers(int n0, int n1, int m, vector<pair<int, int>> edges){
+    vector<int> crossings(n1 * n1, 0);
+    int u, v;
+    for (int i = 0;  i < m; i++){
+        for (int j = i + 1;  j < m; j++){
+            if(i == 6 && j == 1){
+                int a = 0;
+            }
+            u = edges[i].second - n0 - 1;   // offset to have the right indices,
+            v = edges[j].second - n0 - 1;   // This is not the node number anymore
+
+            if (u!=v && edges[i].first < edges[j].first){ // Note that i < j and therefore the fixed layer vertices are ordered
+                crossings[n1 * v + u]++;
+            }
+        }
+    }
+    return crossings;
+}
+
+
+vector<int> greedy_ordering(int n0, int n1, vector<int> initial_order, vector<int> crossings){
+    int u, v;
+    vector<int> order(initial_order);
+    int temp, i = 0, j = 1; // we look at two vertices of consecutive positions i, j
+    while(j < n1){
+        u = order[i] - n0 - 1;
+        v = order[j] - n0 - 1;
+        if (crossings[n1 * u + v] > crossings[n1 * v + u]){
+            temp = order[i];
+            order[i] = order[j];
+            order[j] = temp;
+            i--;            // The vertex i-1 could have been affected.
+            j--;
+        }
+        else{
+            i++;
+            j++;
+        }
+    }
+    return order;
+}
 
 vector<int> barycenter_ordering(int n0, int n1, vector<int> offset, vector<pair<int, int>> edges)
 {
