@@ -142,9 +142,9 @@ int pipeline(int argc, char **argv)
         return 1;
     }
 
-    for (int i = 0; i < n1; i++)
+    for (auto v: order)
     {
-        output_file << order[i] << endl;
+        output_file << v << endl;
     }
 
     output_file.close();

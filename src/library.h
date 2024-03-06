@@ -44,8 +44,10 @@ vector<int> greedy_ordering(int n0, int n1, vector<int> initial_order, vector<in
             temp = order[i];
             order[i] = order[j];
             order[j] = temp;
-            i--;            // The vertex i-1 could have been affected.
-            j--;
+            if (i > 0){
+                i--;            // The vertex i-1 could have been affected.
+                j--;
+            } 
         }
         else{
             i++;
