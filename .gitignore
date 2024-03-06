@@ -1,7 +1,9 @@
 build/*
 *.out
+*.sol
 *.gr
 sol/*
+*.ipynb
 .vscode
 *.sh
 pace_env/

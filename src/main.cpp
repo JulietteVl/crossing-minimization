@@ -2,12 +2,21 @@
 #include <fstream>
 #include <sstream>
 #include <bits/stdc++.h>
+#include <unistd.h>
 
 #include "library.h"
 
 using namespace std;
 
+int pipeline(int argc, char **argv);
+
 int main(int argc, char **argv)
+{
+    pipeline(argc, argv);
+    return 0;
+}
+
+int pipeline(int argc, char **argv)
 {
     // Check and process arguments
     if (argc < 3)
@@ -19,6 +28,26 @@ int main(int argc, char **argv)
     string input_name = argv[1];
     string output_name = argv[2];
 
+    int opt;
+    bool apply_greedy = false;
+    bool apply_barycenter = false;
+    bool apply_median = false;
+    while ((opt = getopt(argc, argv, "bmg")) != -1) {
+        switch (opt) {
+            case 'b':
+                apply_barycenter = true;
+                break;
+            case 'm':
+                apply_median = true;
+                break;
+            case 'g':
+                apply_greedy = true;
+                break;
+            default:
+                break;
+        }
+    }
+
     // Open input file and get input
     ifstream input_file(input_name);
 
@@ -28,10 +57,9 @@ int main(int argc, char **argv)
     }
     string line;
     int n0, n1, m, u, v;
-    int *offset;
-    pair<int, int> *edges;
+    vector<int> offset;             // size n0 + n1 + 2 (1-indexed as the nodes and we need 1 more)
+    vector<pair<int, int>> edges;   // size 2m
 
-    int i = 0;
     while (getline(input_file, line))
     {
         // Skip comment lines
@@ -46,8 +74,7 @@ int main(int argc, char **argv)
             std::stringstream ss(line);
             string p, ocr;
             ss >> p >> ocr >> n0 >> n1 >> m;
-            edges = new pair<int, int> [2 * m];
-            offset = new int[n0 + n1 + 2];
+            offset.resize(n0 + n1 + 2, 0);
         }
 
         else
@@ -56,13 +83,14 @@ int main(int argc, char **argv)
             // TODO should I check for comments in the middle?
             istringstream iss(line);
             iss >> u >> v;
-            edges[i++] = make_pair(u, v);
-            edges[i++] = make_pair(v, u);
+            edges.push_back(make_pair(u, v));
+            edges.push_back(make_pair(v, u));
         }
     }
 
-    sort(edges, edges + 2 * m, compare_first);
-    int j = 0;  // offset array index. There will be nothing at 0 because the nodes are 1-indexed.
+    // Compute offset array
+    sort(edges.begin(), edges.end(), compare_first);
+    int j = 0;  // offset array index. There will be whatever at 0 because the nodes are 1-indexed.
     for (int i = 0; i < 2 * m; i++)
     {
         u = edges[i].first;
@@ -72,44 +100,39 @@ int main(int argc, char **argv)
     }
     offset[j + 1] = 2 * m;
 
-    // cout << "sorted edges:" << endl;
-    // for (int i = 0; i < 2 * m; i++){
-    //     cout << edges[i].first << ' ' << edges[i].second << endl;
-    // }
-
-    // cout << endl;
-
-    // cout << "offset array:" << endl;
-    // for (int i = 1; i <= n0 + n1 + 1; i++){
-    //     cout << offset[i] << " ";
-    // }
-
-    // cout << endl;
-
-    // Apply some algorithm to the input
-    // Barycenter heuristic
-    pair<int, double>* average_position = new pair<int, double> [n1 + 1];
-    for (int i = n0 + 1; i <= n0 + n1; i++)
-    {
-        double sum = 0;
-        int count = 0;
-
-        for (int j = offset[i]; j < offset[i + 1]; j++)
-        {
-            sum += edges[j].second;
-            count++;
+    if (false){
+        // print edges
+        cout << "sorted edges:" << endl;
+        for (int i = 0; i < 2 * m; i++){
+            cout << edges[i].first << ' ' << edges[i].second << endl;
         }
-        if (count > 0) average_position[i - n0 - 1] = make_pair(i, sum / count);
-        else average_position[i - n0 - 1] = make_pair(i, 0);
+         cout << endl;
     }
 
-    // cout << "average position:" << endl;
-    // for (int i = 0; i < n1; i++){
-    //     cout << average_position[i].first << " " << average_position[i].second << endl;
-    // }
-    sort(average_position, average_position + n1, compare_second);
+    if (false){
+        // print offset array
+        cout << "offset array:" << endl;
+        for (int i = 1; i <= n0 + n1 + 1; i++){
+            cout << offset[i] << " ";
+        }
+        cout << endl;
+    }
 
-
+    // Apply some algorithm to the input
+    vector<int> crossings = crosssing_numbers(n0, n1, m, edges);
+    vector<int> order(n1);
+    if (apply_greedy){
+        iota(order.begin(), order.end(), n0 + 1);
+    }
+    if (apply_median){
+        order = median_ordering(n0, n1, offset, edges); // array of size n1
+    }
+    if (apply_barycenter){
+        order = barycenter_ordering(n0, n1, offset, edges); // array of size n1
+    }
+    if (apply_greedy){
+        order = greedy_ordering(n0, n1, order, crossings);
+    }
 
     // Output
     ofstream output_file(output_name);
@@ -119,14 +142,11 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    for (int i = 0; i < n1; i++)
+    for (auto v: order)
     {
-        output_file << average_position[i].first << endl;
+        output_file << v << endl;
     }
 
     output_file.close();
-
-    delete[] offset;
-    delete[] edges;
     return 0;
 }
