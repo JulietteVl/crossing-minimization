@@ -5,7 +5,7 @@
 #include <unistd.h>
 
 #include "library.h"
-#include "input.h"
+#include "graph.h"
 
 using namespace std;
 
@@ -50,7 +50,7 @@ int pipeline(int argc, char **argv)
     }
 
     // Open input file and get input
-    Graph graph = input(input_name);
+    Graph graph(input_name);
     int n0 = graph.n0;
     int n1 = graph.n1;
     int m = graph.m;
