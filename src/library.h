@@ -3,8 +3,8 @@
 
 using namespace std;
 
-int crossing_count(int n0, int n1, int m, vector<pair<int, int>> edges_to_copy, vector<int> order);
-vector<int> crosssing_numbers(int n0, int n1, int m, vector<pair<int, int>> edges, vector<int> order);
+int crossing_count(int n0, int n1, int m, vector<pair<int, int>> edges, vector<int> order);
+vector<int> crosssing_numbers(int n0, int n1, int m, vector<pair<int, int>> edges);
 
 vector<int> barycenter_ordering(int n0, int n1, vector<int> offset, vector<pair<int, int>> edges);
 vector<int> median_ordering(int n0, int n1, vector<int> offset, vector<pair<int, int>> edges);
@@ -25,8 +25,8 @@ int crossing_count(int n0, int n1, int m, vector<pair<int, int>> edges, vector<i
     return S;
 }
 
-// quadratic in the number of edges
 vector<int> crosssing_numbers(int n0, int n1, int m, vector<pair<int, int>> edges){
+    // quadratic in the number of edges
     vector<int> crossings(n1 * n1, 0);
     int u, v;
     for (int i = 0;  i < m; i++){
