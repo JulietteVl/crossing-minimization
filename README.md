@@ -11,6 +11,6 @@ python path_to_script/graphs_statistics.py -p path_to_your_graph -r start end
 ```
 To use the heuristics, compile (i.e `g++ src/main.cpp`) and run:
 ```
-path/to/excecutable input output -[heuristics]
+path/to/excecutable input output
 ```
-Available heuristics (median m, barycenter b, greedy switching g), they cannot be combined yet.
+This gives the best result between median or barycenter + greedy
