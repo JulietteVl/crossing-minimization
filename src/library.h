@@ -1,19 +1,32 @@
 #include <bits/stdc++.h>
+#include "helpers.h"
 
 using namespace std;
 
+int crossing_count(int n0, int n1, int m, vector<pair<int, int>> edges, vector<int> order);
 vector<int> crosssing_numbers(int n0, int n1, int m, vector<pair<int, int>> edges);
 
 vector<int> barycenter_ordering(int n0, int n1, vector<int> offset, vector<pair<int, int>> edges);
 vector<int> median_ordering(int n0, int n1, vector<int> offset, vector<pair<int, int>> edges);
 vector<int> greedy_ordering(int n0, int n1, vector<int> initial_order, vector<int> crossings);
 
-bool compare_first(const pair<int, double> &a, const pair<int, double> &b);
-bool compare_second(const pair<int, double> &a, const pair<int, double> &b);
+int crossing_count(int n0, int n1, int m, vector<pair<int, int>> edges, vector<int> order){
+    edges.resize(m);                                        // remove duplicates
+    vector<int> position = order_to_position(order, n0);    // position between 1 and n1!
+    sort(edges.begin(), edges.end(), make_comparison(position, n0));    // sort lexicographically using the order.
+    int po2 = next_power_of_2(n1);
+    vector<int> tree(2 * po2, 0);
+    int S = 0;
+    for (auto e: edges){
+        S += sum(tree, po2, position[e.second - n0 - 1] + 1, n1);   // any edge that happened earlier in the lexicographic order and has its other endpoint after crosses e 
+                                                                    // (or is a duplicate of e)
+        update(tree, po2, position[e.second - n0 - 1]);             // add the edge to the segment tree
+    }
+    return S;
+}
 
-
-// quadratic in the number of edges
 vector<int> crosssing_numbers(int n0, int n1, int m, vector<pair<int, int>> edges){
+    // quadratic in the number of edges
     vector<int> crossings(n1 * n1, 0);
     int u, v;
     for (int i = 0;  i < m; i++){
@@ -31,7 +44,6 @@ vector<int> crosssing_numbers(int n0, int n1, int m, vector<pair<int, int>> edge
     }
     return crossings;
 }
-
 
 vector<int> greedy_ordering(int n0, int n1, vector<int> initial_order, vector<int> crossings){
     int u, v;
@@ -118,19 +130,3 @@ vector<int> median_ordering(int n0, int n1, vector<int> offset, vector<pair<int,
     return order;
 }
 
-bool compare_first(const pair<int, double> &a, const pair<int, double> &b)
-{
-    if (a.first == b.first)
-    {
-        return a.second < b.second;
-    }
-    return a.first < b.first;
-}
-
-bool compare_second(const pair<int, double> &a, const pair<int, double> &b)
-{
-    if (a.second == b.second){
-        return a.first < b.first;
-    }
-    return a.second < b.second;
-}
