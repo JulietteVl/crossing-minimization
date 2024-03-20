@@ -119,9 +119,10 @@ int pipeline(int argc, char **argv)
     }
 
     // Apply some algorithm to the input
-    vector<int> crossings = crosssing_numbers(n0, n1, m, edges);
+    vector<int> crossings;
     vector<int> order(n1);
     if (apply_greedy){
+        crossings = crosssing_numbers(n0, n1, m, edges);
         iota(order.begin(), order.end(), n0 + 1);
     }
     if (apply_median){
@@ -133,6 +134,8 @@ int pipeline(int argc, char **argv)
     if (apply_greedy){
         order = greedy_ordering(n0, n1, order, crossings);
     }
+
+    cout << crossing_count(n0, n1, m, edges, order) << endl;
 
     // Output
     ofstream output_file(output_name);

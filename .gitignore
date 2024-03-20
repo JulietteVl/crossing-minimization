@@ -2,6 +2,7 @@ build/*
 *.out
 *.sol
 *.gr
+*.txt
 sol/*
 *.ipynb
 .vscode
