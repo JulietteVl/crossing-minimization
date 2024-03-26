@@ -2,18 +2,40 @@
 
 using namespace std;
 
+
+struct Edge{
+    int first;
+    int second;
+    int weight = 1;
+
+    Edge(){}
+    Edge(int u, int v){
+        first = u; second = v;
+    }
+    Edge(int u, int v, int weight){
+        first = u; second = v;
+        this->weight = weight;
+    }
+    ~Edge(){}
+
+    friend bool operator< (const Edge lhs, const Edge rhs){
+        if (lhs.first == rhs.first)
+        {
+            return lhs.second < rhs.second;
+        }
+        return lhs.first < rhs.first;
+    }
+};
+
+
 // segement tree
 vector<int> order_to_position(vector<int> order, int n0);
 int next_power_of_2(int v);
 void update(vector<int>& tree, int n, int k);
 int sum(vector<int> tree, int n, int a, int b);
 
-// comparisons
-bool compare_first(pair<int, int> a, pair<int, int> b);
-bool compare_second(pair<int, int> a, pair<int, int> b);
+// comparison
 auto make_comparison(vector<int> order, int n0);
-
-
 
 
 
@@ -68,26 +90,9 @@ int sum(vector<int> tree, int n, int a, int b)
     return s;
 }
 
-// comparisons
-bool compare_first(pair<int, int> a, pair<int, int> b)
-{
-    if (a.first == b.first)
-    {
-        return a.second < b.second;
-    }
-    return a.first < b.first;
-}
-
-bool compare_second(pair<int, int> a, pair<int, int> b)
-{
-    if (a.second == b.second){
-        return a.first < b.first;
-    }
-    return a.second < b.second;
-}
-
+// comparison
 auto make_comparison(vector<int> position, int n0){
-    return [position, n0](pair<int, int> a, pair < int, int> b)
+    return [position, n0](Edge a, Edge b)
     {
         if (a.first == b.first)
         {

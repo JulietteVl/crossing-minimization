@@ -7,7 +7,7 @@ class Graph{
     public:
         int n0, n1, m;
         int best_crossing_count = INT_MAX;
-        vector<pair<int, int>> edges;   // size 2m, we store them in both directions.
+        vector<Edge> edges;             // edge + weight. size 2m, we store them in both directions. 
         vector<int> offset;             // size n0 + n1 + 2 (1-indexed as the nodes and we need 1 more)
         vector<int> order;              // the one we are working on at the moment
         vector<int> best_order;
@@ -15,12 +15,13 @@ class Graph{
     public:
         Graph(string input_name);
         ~Graph();
-        void update_best();
         int crossing_count();
         void compute_crossing_numbers();
         void barycenter_ordering();
         void median_ordering();
         void greedy_ordering();
+    private:
+        void update_best();
 };
 
 Graph::Graph(string input_name)
@@ -58,13 +59,13 @@ Graph::Graph(string input_name)
             // TODO should I check for comments in the middle?
             istringstream iss(line);
             iss >> u >> v;
-            edges.push_back(make_pair(u, v));
-            edges.push_back(make_pair(v, u));
+            edges.push_back(Edge(u, v));
+            edges.push_back(Edge(v, u));
         }
     }
 
     // Compute offset array
-    sort(edges.begin(), edges.end(), compare_first);
+    sort(edges.begin(), edges.end());
     int j = 0;  // offset array index. There will be whatever at 0 because the nodes are 1-indexed.
     for (int i = 0; i < 2 * m; i++)
     {
@@ -122,11 +123,12 @@ void Graph::compute_crossing_numbers(){
     }
 }
 
+// -------------------- Heuristics --------------------
 
 void Graph::barycenter_ordering()
 {
     // return the free vertices ordered by the average of their neighbours.
-    vector<pair<int, double>> average_position(n1);
+    vector<pair<double, int>> average_position(n1); // for sorting purposes, let us store the median and then the vertex number
     order.resize(n1);
     for (int i = n0 + 1; i <= n0 + n1; i++)
     {
@@ -139,20 +141,14 @@ void Graph::barycenter_ordering()
             count++;
         }
         if (count > 0)
-            average_position[i - n0 - 1] = make_pair(i, sum / count);
+            average_position[i - n0 - 1] = make_pair(sum / count, i);
         else
-            average_position[i - n0 - 1] = make_pair(i, 0);
+            average_position[i - n0 - 1] = make_pair(0, i);
     }
-    if (false){
-        cout << "average position:" << endl;
-        for (int i = 0; i < n1; i++){
-            cout << average_position[i].first << " " << average_position[i].second << endl;
-        }
-    }
-    sort(average_position.begin(), average_position.end(), compare_second);
+    sort(average_position.begin(), average_position.end());
     for (int i = 0; i < n1; i++)
     {
-        order[i] = average_position[i].first;
+        order[i] = average_position[i].second;
     }
     update_best();
 }
@@ -160,26 +156,21 @@ void Graph::barycenter_ordering()
 void Graph::median_ordering()
 {
     // return the free vertices ordered by the median of their neighbours.
-    vector<pair<int, double>>median_position(n1);
+    vector<pair<double, int>>median_position(n1);   // for sorting purposes, let us store the median and then the vertex number
     order.resize(n1);
     for (int i = n0 + 1; i <= n0 + n1; i++)
     {
         int middle = (offset[i] + offset[i + 1] - 1) / 2;
         if (offset[i] < offset[i + 1])
-            median_position[i - n0 - 1] = make_pair(i, edges[middle].second);
+            median_position[i - n0 - 1] = make_pair(edges[middle].second, i);
         else
-            median_position[i - n0 - 1] = make_pair(i, 0);
+            median_position[i - n0 - 1] = make_pair(0, i);
     }
-    if (false){ // display medians
-        cout << "median position:" << endl;
-        for (int i = 0; i < n1; i++){
-            cout << median_position[i].first << " " << median_position[i].second << endl;
-        }
-    }
-    sort(median_position.begin(), median_position.end(), compare_second);
+
+    sort(median_position.begin(), median_position.end());
     for (int i = 0; i < n1; i++)
     {
-        order[i] = median_position[i].first;
+        order[i] = median_position[i].second;
     }
     update_best();
 }

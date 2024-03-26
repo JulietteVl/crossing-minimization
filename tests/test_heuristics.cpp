@@ -10,6 +10,15 @@ TEST(example, test_median)
     ASSERT_EQ(graph.crossing_count(), 3);
 }
 
+TEST(example, test_barycenter)
+{
+    Graph graph("example_input.gr");
+    graph.compute_crossing_numbers();
+    graph.barycenter_ordering();
+    graph.greedy_ordering();
+    ASSERT_EQ(graph.crossing_count(), 3);
+}
+
 TEST(example, test_position)
 {
     int n0 = 5;
