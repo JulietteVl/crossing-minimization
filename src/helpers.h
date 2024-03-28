@@ -25,21 +25,28 @@ struct Edge{
         }
         return lhs.first < rhs.first;
     }
+
+    bool operator== (Edge e){
+        return (this->first == e.first) && (this->second == e.second);
+    }
 };
 
 
 // segement tree
+
 vector<int> order_to_position(vector<int> order, int n0);
 int next_power_of_2(int v);
 void update(vector<int>& tree, int n, int k);
 int sum(vector<int> tree, int n, int a, int b);
 
 // comparison
+
 auto make_comparison(vector<int> order, int n0);
 
 
 
 // segment tree
+
 vector<int> order_to_position(vector<int> order, int n0){
     int n1 = order.size();
     vector<int> position(n1);
@@ -91,6 +98,7 @@ int sum(vector<int> tree, int n, int a, int b)
 }
 
 // comparison
+
 auto make_comparison(vector<int> position, int n0){
     return [position, n0](Edge a, Edge b)
     {

@@ -32,16 +32,19 @@ int pipeline(int argc, char **argv)
     Graph graph(input_name);
 
     // Apply some algorithm to the input - we keep the best result
-    graph.compute_crossing_numbers();
+    // graph.compute_crossing_numbers();
 
-    graph.median_ordering();
-    graph.greedy_ordering();
+    // graph.median_ordering();
+    // graph.greedy_ordering();
     
-    graph.barycenter_ordering();
-    graph.greedy_ordering();
+    // graph.barycenter_ordering();
+    // graph.greedy_ordering();
+
+    vector<vector<int>> groups({{1, 2}});
+    Graph G2(graph, groups);
 
     cout << graph.crossing_count() << endl;
-    vector<int> order = graph.order;
+    vector<int> order = G2.get_order();
 
     // Output
     ofstream output_file(output_name);
