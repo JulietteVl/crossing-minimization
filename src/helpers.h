@@ -41,7 +41,8 @@ int sum(vector<int> tree, int n, int a, int b);
 
 // comparison
 
-auto make_comparison(vector<int> order, int n0);
+auto make_comparison(vector<int> position, int n0);
+auto make_average_comparison(vector<int> position, int n0);
 
 
 
@@ -107,5 +108,21 @@ auto make_comparison(vector<int> position, int n0){
             return position[a.second - n0 - 1] < position[b.second - n0 - 1];
         }
         return a.first < b.first;
+    };
+}
+
+auto make_average_comparison(vector<int> position, int n0){
+    return[position, n0](vector<int> a, vector<int> b)
+    {
+        int pos_a = 0, pos_b = 0;
+        for (int v: a){
+            pos_a += position[v - n0 - 1];   // size n1, 0 indexed     
+        }
+        pos_a /= a.size();
+        for (int v: b){
+            pos_b+= position[v - n0 - 1];   // size n1, 0 indexed     
+        }
+        pos_b /= b.size();
+        return a < b;
     };
 }

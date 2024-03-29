@@ -10,13 +10,13 @@ class Graph{
         vector<Edge> edges;             // size 2m, we store them in both directions. 
         vector<int> offset;             // size n0 + n1 + 2 (1-indexed as the nodes and we need 1 more)
         vector<int> crossings;
-        vector<vector<int>> group;      // group[i]: original vertices contracted in i
+        vector<vector<int>> group;      // group[i]: original vertices contracted in i. Empty is there has been no contraction.
     private:                            // orders need to be reconstructed if we have merged vertices
         vector<int> order;              // the one we are working on at the moment
         vector<int> best_order;
     public:
         Graph(string input_name);
-        Graph(Graph graph, vector<vector<int>> groups);
+        Graph(Graph graph, vector<vector<int>> contract_fixed, vector<vector<int>> contract_free);
         ~Graph();
         vector<int> get_order(){return reconstruct_order(order);}
         vector<int> get_best_order(){return reconstruct_order(best_order);}
@@ -80,51 +80,56 @@ Graph::Graph(string input_name)
 }
 
 // TODO This version only handles correctly merging vertices 1 - n0
-Graph::Graph(Graph graph, vector<vector<int>> to_contract){
+Graph::Graph(Graph graph, vector<vector<int>> contract_fixed, vector<vector<int>> contract_free){
     n0 = graph.n0; n1 = graph.n1; m = graph.m;      // We will update this as we go
     vector<bool> is_grouped(n0 + n1 + 1, false);    // we need to keep the vertices that have not been contracted
     vector<int> replacement(n0 + n1 + 1);           // what vertex i is replaced by in the new graph
-    vector<int> all_u;
-    vector<int> all_v;
 
-    int group_number = 1;
     vector<int> placeholder(0);
     group.push_back(placeholder);   // sticking to 1-indexing, sadly
 
     // get n0, n1
-    for (auto group_: to_contract){
-        // update n0, n1
-        if (group_[0] <= graph.n0){
-            n0 -= group_.size() - 1;
-        } 
-        else{
-            n1 -= group.size() - 1 ;
-        }
+    for (auto group_: contract_fixed){
+        n0 -= group_.size() - 1;
+        for (int v: group_){ is_grouped[v] = true; }
+    }
+    for (auto group_: contract_free){
+        n1 -= group.size() - 1 ;
+        for (int v: group_){ is_grouped[v] = true; }
     }
     // handle the single vertices: put them in their own group
-    for (int v = 1; v <= graph.n0 + graph.n1; v++){
-        if(is_grouped[v]){
-            continue;
-        }
-        group.push_back({v});
-        replacement[v] = group_number ++;
+    for (int v = 1; v <= graph.n0; v++){
+        if(!is_grouped[v]){
+            contract_fixed.push_back({v});
+        }  
     }
+    for (int v = graph.n0 + 1; v <= graph.n0 + graph.n1; v++){
+        if(!is_grouped[v]){
+            contract_free.push_back({v});
+        }
+    }
+    // If the grouped vertices were consecutive in the graph order, this preserves the order.
+    // fixed layer:
+    sort(contract_fixed.begin(), contract_fixed.end());
+    // free layer:
+    vector<int> position = order_to_position(graph.order, graph.n0);
+    sort(contract_free.begin(), contract_free.end(), make_average_comparison(position, graph.n0));
+
+    int group_number = 1;
     // handle the groups
-    for (auto group_: to_contract){
+    for (auto group_: contract_fixed){
         for (int v: group_){
-            is_grouped[v] = true;
             replacement[v] = group_number;
         }
         group.push_back(group_);
         group_number ++;
     }
-    // handle the single vertices: put them in their own group
-    for (int v = 1; v <= graph.n0 + graph.n1; v++){
-        if(is_grouped[v]){
-            continue;
+    for (auto group_: contract_free){
+        for (int v: group_){
+            replacement[v] = group_number;
         }
-        group.push_back({v});
-        replacement[v] = group_number ++;
+        group.push_back(group_);
+        group_number ++;
     }
     // rename edges
     vector<Edge> edges_temp;
@@ -149,7 +154,7 @@ Graph::Graph(Graph graph, vector<vector<int>> to_contract){
 
     // initialise order
     order.resize(n1);
-    iota(order.begin(), order.end(), n0 + 1);
+    std::iota(order.begin(), order.end(), n0 + 1);
 }
 
 Graph::~Graph(){}
@@ -177,6 +182,9 @@ void Graph::update_best(){
 }
 
 vector<int> Graph::reconstruct_order(vector<int> order_contracted){
+    if (group.empty()){     // nothing has been contracted
+        return order_contracted;
+    }
     vector<int> order_full;
     for (int v: order){
         for (int u: group[v]){
@@ -188,6 +196,7 @@ vector<int> Graph::reconstruct_order(vector<int> order_contracted){
 
 // -------------------- Crossings --------------------
 
+// uses the current order and not necessarily the best one.
 int Graph::crossing_count(){
     edges.resize(m);                                        // remove duplicates
     vector<int> position = order_to_position(order, n0);    // position between 1 and n1!
@@ -229,15 +238,15 @@ void Graph::barycenter_ordering()
     // return the free vertices ordered by the average of their neighbours.
     vector<pair<double, int>> average_position(n1); // for sorting purposes, let us store the median and then the vertex number
     order.resize(n1);
+    int count;
     for (int i = n0 + 1; i <= n0 + n1; i++)
     {
         double sum = 0;
-        int count = 0;
+        count = offset[i + 1] - offset[i];
 
         for (int j = offset[i]; j < offset[i + 1]; j++)
         {
             sum += edges[j].second;
-            count++;
         }
         if (count > 0)
             average_position[i - n0 - 1] = make_pair(sum / count, i);
@@ -260,10 +269,12 @@ void Graph::median_ordering()
     for (int i = n0 + 1; i <= n0 + n1; i++)
     {
         int middle = (offset[i] + offset[i + 1] - 1) / 2;
-        if (offset[i] < offset[i + 1])
+        if (offset[i] == offset[i + 1])
+            median_position[i - n0 - 1] = make_pair(0, i);
+        else if ((offset[i + 1] - offset[i]) % 2 == 1)
             median_position[i - n0 - 1] = make_pair(edges[middle].second, i);
         else
-            median_position[i - n0 - 1] = make_pair(0, i);
+            median_position[i - n0 - 1] = make_pair((edges[middle].second + edges[middle + 1].second)/2.0, i);
     }
     sort(median_position.begin(), median_position.end());
     for (int i = 0; i < n1; i++)

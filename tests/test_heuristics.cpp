@@ -1,22 +1,47 @@
 #include <gtest/gtest.h>
 #include "../src/graph.h"
 
-TEST(example, test_median)
+TEST(example, test_greedy)
 {
     Graph graph("example_input.gr");
     graph.compute_crossing_numbers();
-    graph.median_ordering();
     graph.greedy_ordering();
     ASSERT_EQ(graph.crossing_count(), 3);
+}
+
+TEST(example, test_median)
+{
+    Graph graph("example_input.gr");
+    graph.median_ordering();
+    vector<int> order({9, 6, 10, 11, 7, 8});
+    ASSERT_EQ(graph.get_order(), order);
 }
 
 TEST(example, test_barycenter)
 {
     Graph graph("example_input.gr");
-    graph.compute_crossing_numbers();
     graph.barycenter_ordering();
-    graph.greedy_ordering();
+    vector<int> order({9, 6, 11, 10, 7, 8});
+    ASSERT_EQ(graph.get_order(), order);
+}
+
+TEST(example, test_count)
+{
+    Graph graph("example_input.gr");
+    graph.median_ordering();
+    ASSERT_EQ(graph.crossing_count(), 4);
+    graph.barycenter_ordering();
     ASSERT_EQ(graph.crossing_count(), 3);
+}
+
+TEST(example, test_contraction)
+{
+    Graph G1("example_input.gr");
+    G1.barycenter_ordering();
+    vector<vector<int>> fixed({{1, 2}});
+    vector<vector<int>> free({{11, 10}});
+    Graph G2(G1, fixed, free);
+    ASSERT_EQ(G1.crossing_count(), 3);
 }
 
 TEST(example, test_position)
