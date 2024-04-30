@@ -44,6 +44,18 @@ TEST(example, test_contraction)
     ASSERT_EQ(G1.crossing_count(), 3);
 }
 
+TEST(example, test_median_contraction)
+{
+    Graph G1("example_input.gr");
+    vector<vector<int>> fixed({{1, 2}});
+    vector<vector<int>> free({{10, 11}});
+    Graph G2(G1, fixed, free);
+    G2.median_ordering();
+    ASSERT_EQ(G2.crossing_count(), 0);
+    G1.assign_order(G2.get_best_order());
+    ASSERT_EQ(G1.crossing_count(), 5);
+}
+
 TEST(example, test_position)
 {
     int n0 = 5;

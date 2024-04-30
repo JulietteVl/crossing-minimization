@@ -40,9 +40,13 @@ int pipeline(int argc, char **argv)
     graph.barycenter_ordering();
     graph.greedy_ordering();
 
+    // Test contraction
     vector<vector<int>> fixed({{1, 2}});
     vector<vector<int>> free({{10, 11}});
-    Graph G2(graph, fixed, free);
+
+    // Graph G2(graph, fixed, free);
+    // G2.median_ordering(); // useless to use global heuristics on local graph?
+    // graph.assign_order(G2.get_best_order());
 
     cout << graph.best_crossing_count << endl;
     vector<int> order = graph.get_best_order();
