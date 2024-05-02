@@ -41,17 +41,35 @@ int pipeline(int argc, char **argv)
     graph.greedy_ordering();
 
     // Test contraction
-    vector<vector<int>> fixed({{1, 2}});
-    vector<vector<int>> free({{10, 11}});
-
+    // vector<vector<int>> fixed({{1, 2}});
+    // vector<vector<int>> free({{10, 11}});
     // Graph G2(graph, fixed, free);
-    // G2.median_ordering(); // useless to use global heuristics on local graph?
+    // G2.median_ordering(); // useless to use global heuristics on local graph...
     // graph.assign_order(G2.get_best_order());
 
-    cout << graph.best_crossing_count << endl;
-    vector<int> order = graph.get_best_order();
+    // Recursive contraction
+    order = graph.get_best_order();
+
+    // vector<vector<int>> fixed;
+    // vector<vector<int>> free(order.begin(), order.begin() + graph.n1 / 2);
+    // Graph G2(graph, fixed, free);
+
+    // int s1, s2;
+    // for (int i = 2; i < log2(graph.n1); i++){
+    //     free.resize(0);
+    //     for (int j = 0; j < pow(2, i); j++){
+    //         s1 = (j * graph.n1) / pow(2, i);
+    //         s2 = ((j + 1) * graph.n1) / pow(2, i);
+    //         vector<int> subgroup(order.begin() + s1, order.begin() + s2);
+    //         free.push_back(subgroup);
+    //     }
+    //     Graph G2(graph, fixed, free);
+    // }
+    // order = G2.get_best_order();
+    // graph.assign_order(order);
 
     // Output
+    cout << graph.best_crossing_count << endl; // just to know
     ofstream output_file(output_name);
 
     if (!output_file.is_open()) {
