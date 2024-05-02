@@ -27,12 +27,12 @@ int pipeline(int argc, char **argv)
 
     string input_name = argv[1];
     string output_name = argv[2];
+    vector<int> order;
 
     // Open input file and get input
     Graph graph(input_name);
 
     // Apply some algorithm to the input - we keep the best result
-    graph.compute_crossing_numbers();
 
     graph.median_ordering();
     graph.greedy_ordering();

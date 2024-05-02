@@ -230,14 +230,11 @@ void Graph::compute_crossing_numbers(){
     int u, v;
     for (int i = 0;  i < m; i++){
         for (int j = i + 1;  j < m; j++){
-            if(i == 6 && j == 1){
-                int a = 0;
-            }
             u = edges[i].second - n0 - 1;   // offset to have the right indices,
             v = edges[j].second - n0 - 1;   // This is not the node number anymore
 
             if (u!=v && edges[i].first < edges[j].first){ // Note that i < j and therefore the fixed layer vertices are ordered
-                crossings[n1 * v + u]++;
+                crossings[n1 * v + u] += edges[i].weight * edges[j].weight;
             }
         }
     }
@@ -320,6 +317,9 @@ void Graph::median_ordering()
 }
 
 void Graph::greedy_ordering(){
+    if (crossings.empty()){
+        compute_crossing_numbers();
+    }
     int u, v;
     int temp, i = 0, j = 1; // we look at two vertices of consecutive positions i, j
     while(j < n1){

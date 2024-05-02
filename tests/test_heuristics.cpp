@@ -56,6 +56,15 @@ TEST(example, test_median_contraction)
     ASSERT_EQ(G1.crossing_count(), 5);
 }
 
+TEST(example, test_contraction_count)
+{
+    Graph G1("example_input.gr");
+    vector<vector<int>> fixed({{1, 2}});
+    vector<vector<int>> free({{11, 10}});
+    Graph G2(G1, fixed, free);
+    ASSERT_EQ(G2.crossing_count(), 10);
+}
+
 TEST(example, test_position)
 {
     int n0 = 5;
