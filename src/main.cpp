@@ -29,44 +29,63 @@ int pipeline(int argc, char **argv)
     string output_name = argv[2];
     vector<int> order;
 
+    int opt;
+    bool recursive = false;
+    bool b = false;
+    bool m =false;
+    bool g = false;
+    while ((opt = getopt(argc, argv, "rbmg")) != -1) {
+        switch (opt) {
+            case 'r':
+                recursive = true;
+                break;
+            case 'm':
+                m = true;
+                break;
+            case 'b':
+                b = true;
+                break;
+            case 'g':
+                g = true;
+                break;
+            default:
+                break;
+        }
+    }
+
     // Open input file and get input
     Graph graph(input_name);
 
     // Apply some algorithm to the input - we keep the best result
 
-    graph.median_ordering();
-    graph.greedy_ordering();
-    
-    graph.barycenter_ordering();
-    graph.greedy_ordering();
+    if (m)
+        graph.median_ordering();
+    if (b)
+        graph.barycenter_ordering();
+    if (g)
+        graph.greedy_ordering();
 
     // Test contraction
-    // vector<vector<int>> fixed({{1, 2}});
-    // vector<vector<int>> free({{10, 11}});
-    // Graph G2(graph, fixed, free);
-    // G2.median_ordering(); // useless to use global heuristics on local graph...
-    // graph.assign_order(G2.get_best_order());
-
-    // Recursive contraction
     order = graph.get_best_order();
+    // Recursive contraction
+    if (recursive){
 
-    // vector<vector<int>> fixed;
-    // vector<vector<int>> free(order.begin(), order.begin() + graph.n1 / 2);
-    // Graph G2(graph, fixed, free);
+        vector<int> split_free({graph.n1 / 2});
 
-    // int s1, s2;
-    // for (int i = 2; i < log2(graph.n1); i++){
-    //     free.resize(0);
-    //     for (int j = 0; j < pow(2, i); j++){
-    //         s1 = (j * graph.n1) / pow(2, i);
-    //         s2 = ((j + 1) * graph.n1) / pow(2, i);
-    //         vector<int> subgroup(order.begin() + s1, order.begin() + s2);
-    //         free.push_back(subgroup);
-    //     }
-    //     Graph G2(graph, fixed, free);
-    // }
-    // order = G2.get_best_order();
-    // graph.assign_order(order);
+        int s;
+        for (int i = 1; i < log2(graph.n1) + 1; i++){
+            split_free.resize(0);
+            for (int j = 1; j < pow(2, i); j++){
+                s = (j * graph.n1) / pow(2, i);
+                split_free.push_back(s);
+                }
+            Graph G2(graph, split_free);
+            G2.greedy_ordering();
+            order = G2.get_best_order();
+            graph.assign_order(order);
+        }
+    }
+
 
     // Output
     cout << graph.best_crossing_count << endl; // just to know

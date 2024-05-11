@@ -25,6 +25,22 @@ TEST(example, test_barycenter)
     ASSERT_EQ(graph.get_order(), order);
 }
 
+TEST(example, test_crossing)
+{
+    Graph graph("example_input.gr");
+    graph.compute_crossing_numbers();
+    int cc = 0, u, v;
+    vector<int> order = graph.get_order();
+    for (int i = 0; i < graph.n1; i++){
+        for (int j = i + 1; j < graph.n1; j++){
+            u = order[i] - graph.n0 - 1;
+            v = order[j] - graph.n0 - 1;
+            cc += graph.crossings[graph.n1 * u + v]; 
+        }
+    }
+    ASSERT_EQ(graph.crossing_count(), cc);
+}
+
 TEST(example, test_count)
 {
     Graph graph("example_input.gr");

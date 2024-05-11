@@ -12,12 +12,13 @@ class Graph{
         vector<int> offset;             // size n0 + n1 + 2 (1-indexed as the nodes and we need 1 more)
         vector<int> crossings;
         vector<vector<int>> group;      // group[i]: original vertices contracted in i. Empty is there has been no contraction.
-    private:                            // orders need to be reconstructed if we have merged vertices
-        vector<int> order;              // the one we are working on at the moment
-        vector<int> best_order; 
+    protected:                          // orders need to be reconstructed if we have merged vertices
+        vector<int> order;              // the one we are working on at the moment, in the contracted graph.
+        vector<int> best_order;         // in the contracted graph.
     public:
         Graph(string input_name);
-        Graph(Graph graph, vector<vector<int>> contract_fixed, vector<vector<int>> contract_free);
+        Graph(Graph graph, vector<vector<int>> contract_fixed, vector<vector<int>> contract_free);  // use node numbers
+        Graph(Graph graph, vector<int> split_free);                        // split order (currently free only)
         ~Graph();
         void assign_order(vector<int> external_order);
         vector<int> get_order(){return reconstruct_order(order);}                   // in the original graph
@@ -30,6 +31,7 @@ class Graph{
         // local heuristic
         void greedy_ordering();
     private:
+        void construct(Graph graph, vector<vector<int>> contract_fixed, vector<vector<int>> contract_free);
         vector<int> reconstruct_order(vector<int> order_contracted);
         void make_offset();
         void update_best();
@@ -81,15 +83,13 @@ Graph::Graph(string input_name)
     // initialise order
     order.resize(n1);
     iota(order.begin(), order.end(), n0 + 1);
+    update_best();
 }
 
+// The vertices grouped do not have to be consecutive in the order. the order of the vertices in the groups depend on the current order.
 Graph::Graph(Graph graph, vector<vector<int>> contract_fixed, vector<vector<int>> contract_free){
-    n0 = graph.n0; n1 = graph.n1; m = graph.m;      // We will update this as we go
+    n0 = graph.n0; n1 = graph.n1;                   // We will update this as we go
     vector<bool> is_grouped(n0 + n1 + 1, false);    // we need to keep the vertices that have not been contracted
-    vector<int> replacement(n0 + n1 + 1);           // what vertex i is replaced by in the new graph
-
-    vector<int> placeholder(0);
-    group.push_back(placeholder);   // sticking to 1-indexing, sadly
 
     // get n0, n1
     for (auto subgroup: contract_fixed){
@@ -118,6 +118,43 @@ Graph::Graph(Graph graph, vector<vector<int>> contract_fixed, vector<vector<int>
     vector<int> position = order_to_position(graph.order, graph.n0);
     sort(contract_free.begin(), contract_free.end(), make_average_comparison(position, graph.n0));
 
+    construct(graph, contract_fixed, contract_free);
+}
+
+// The vertices grouped do not have to be consecutive in the order. the order of the vertices in the groups depend on the current order.
+Graph::Graph(Graph graph, vector<int> split_free){
+    // we currently do not contract fixed layer:
+    split_free.push_back(graph.n1);
+    vector<vector<int>> contract_fixed;
+    for (int v = 1; v <= graph.n0; v++){
+        contract_fixed.push_back({v});
+    }
+    vector<vector<int>> contract_free;
+    int i1 = 0;
+    int i2;
+    for (int i2: split_free){
+        if (i1 == i2){
+            continue;
+        }
+        vector<int> subgroup(graph.best_order.begin() + i1, graph.best_order.begin() + i2);
+        contract_free.push_back(subgroup);
+        i1 = i2;  
+    }
+
+    construct(graph, contract_fixed, contract_free);
+}
+
+Graph::~Graph(){}
+
+void Graph::construct(Graph graph, vector<vector<int>> contract_fixed, vector<vector<int>> contract_free){
+    n0 = contract_fixed.size();
+    n1 = contract_free.size();
+    m = graph.m;
+
+    vector<int> placeholder(0);
+    group.push_back(placeholder);   // sticking to 1-indexing, sadly
+
+    vector<int> replacement(graph.n0 + graph.n1 + 1);           // what vertex i is replaced by in the new graph
     int group_number = 1;
     // handle the groups
     for (auto subgroup: contract_fixed){
@@ -158,9 +195,8 @@ Graph::Graph(Graph graph, vector<vector<int>> contract_fixed, vector<vector<int>
     // initialise order
     order.resize(n1);
     std::iota(order.begin(), order.end(), n0 + 1);
+    update_best();
 }
-
-Graph::~Graph(){}
 
 // assumes the edges are sorted
 void Graph::make_offset(){
@@ -200,7 +236,7 @@ vector<int> Graph::reconstruct_order(vector<int> order_contracted){
 }
 
 void Graph::assign_order(vector<int> external_order){
-    this->order = external_order;
+    order = external_order;
     update_best();
 }
 
@@ -208,15 +244,14 @@ void Graph::assign_order(vector<int> external_order){
 
 // uses the current order and not necessarily the best one.
 int Graph::crossing_count(){
-    // TODO make it work when vertices have been contracted
-    // TODO we might want a intra vertex crossing count
-    edges.resize(m);                                        // remove duplicates
+    // This does not include intra vertex crossing count
+    vector<Edge> edges_unique(edges.begin(), edges.begin() + m);                                       // remove duplicates
     vector<int> position = order_to_position(order, n0);    // position between 1 and n1!
-    sort(edges.begin(), edges.end(), make_comparison(position, n0));    // sort lexicographically using the order.
+    sort(edges_unique.begin(), edges_unique.end(), make_comparison(position, n0));    // sort lexicographically using the order.
     int po2 = next_power_of_2(n1);
     vector<int> tree(2 * po2, 0);
     int S = 0;
-    for (auto e: edges){
+    for (auto e: edges_unique){
         S += sum(tree, po2, position[e.second - n0 - 1] + 1, n1);   // any edge that happened earlier in the lexicographic order and has its other endpoint after crosses e 
                                                                     // (or is a duplicate of e)
         update(tree, po2, position[e.second - n0 - 1]);             // add the edge to the segment tree
@@ -232,8 +267,13 @@ void Graph::compute_crossing_numbers(){
         for (int j = i + 1;  j < m; j++){
             u = edges[i].second - n0 - 1;   // offset to have the right indices,
             v = edges[j].second - n0 - 1;   // This is not the node number anymore
-
-            if (u!=v && edges[i].first < edges[j].first){ // Note that i < j and therefore the fixed layer vertices are ordered
+            // Note that i < j and therefore the fixed layer vertices are ordered
+            // So the two edges do not cause a conflict in order uv
+            if (edges[i].first == edges[j].first || u == v){
+                continue;
+            }
+            // the order vu result in a crossing
+            else {
                 crossings[n1 * v + u] += edges[i].weight * edges[j].weight;
             }
         }
