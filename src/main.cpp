@@ -60,6 +60,8 @@ int pipeline(int argc, char **argv)
 
     if (m)
         graph.median_ordering();
+        order = graph.get_best_order();
+        graph.assign_order(order);
     if (b)
         graph.barycenter_ordering();
     if (g)

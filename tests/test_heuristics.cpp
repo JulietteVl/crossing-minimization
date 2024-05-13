@@ -14,7 +14,7 @@ TEST(example, test_median)
     Graph graph("example_input.gr");
     graph.median_ordering();
     vector<int> order({9, 6, 10, 11, 7, 8});
-    ASSERT_EQ(graph.get_order(), order);
+    ASSERT_EQ(graph.get_best_order(), order);
 }
 
 TEST(example, test_barycenter)

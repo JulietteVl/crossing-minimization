@@ -342,6 +342,27 @@ void Graph::median_ordering()
 
         if (n_edges == 0)
             median_position[i - n0 - 1] = make_pair(0, i);
+        else
+            median_position[i - n0 - 1] = make_pair(edges[middle].second, i);
+    }
+    sort(median_position.begin(), median_position.end());
+    for (int i = 0; i < n1; i++)
+    {
+        order[i] = median_position[i].second;
+    }
+    update_best();
+
+    // median version 2, performs better on some but not all examples
+    if (!group.empty()){
+        return;
+    }
+    for (int i = n0 + 1; i <= n0 + n1; i++)
+    {   
+        n_edges = offset[i + 1] - offset[i];
+        middle = (offset[i] + offset[i + 1] - 1) / 2;
+
+        if (n_edges == 0)
+            median_position[i - n0 - 1] = make_pair(0, i);
         else if ((n_edges % 2 == 1) || (edges[middle].weight > 1))
             median_position[i - n0 - 1] = make_pair(edges[middle].second, i);
         else{ // even number of edges AND edge of weight 1 (if weight > 1, the two original middle edges have been merged)
