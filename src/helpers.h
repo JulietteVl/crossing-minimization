@@ -2,22 +2,52 @@
 
 using namespace std;
 
+
+struct Edge{
+    int first;
+    int second;
+    int weight = 1;
+
+    Edge(){}
+    Edge(int u, int v){
+        first = u; second = v;
+    }
+    Edge(int u, int v, int weight){
+        first = u; second = v;
+        this->weight = weight;
+    }
+    ~Edge(){}
+
+    friend bool operator< (const Edge lhs, const Edge rhs){
+        if (lhs.first == rhs.first)
+        {
+            return lhs.second < rhs.second;
+        }
+        return lhs.first < rhs.first;
+    }
+
+    bool operator== (Edge e){
+        return (this->first == e.first) && (this->second == e.second);
+    }
+};
+
+
 // segement tree
+
 vector<int> order_to_position(vector<int> order, int n0);
 int next_power_of_2(int v);
 void update(vector<int>& tree, int n, int k);
 int sum(vector<int> tree, int n, int a, int b);
 
-// comparisons
-bool compare_first(pair<int, int> a, pair<int, int> b);
-bool compare_second(pair<int, int> a, pair<int, int> b);
-auto make_comparison(vector<int> order, int n0);
+// comparison
 
-
+auto make_comparison(vector<int> position, int n0);
+auto make_average_comparison(vector<int> position, int n0);
 
 
 
 // segment tree
+
 vector<int> order_to_position(vector<int> order, int n0){
     int n1 = order.size();
     vector<int> position(n1);
@@ -68,31 +98,31 @@ int sum(vector<int> tree, int n, int a, int b)
     return s;
 }
 
-// comparisons
-bool compare_first(pair<int, int> a, pair<int, int> b)
-{
-    if (a.first == b.first)
-    {
-        return a.second < b.second;
-    }
-    return a.first < b.first;
-}
-
-bool compare_second(pair<int, int> a, pair<int, int> b)
-{
-    if (a.second == b.second){
-        return a.first < b.first;
-    }
-    return a.second < b.second;
-}
+// comparison
 
 auto make_comparison(vector<int> position, int n0){
-    return [position, n0](pair<int, int> a, pair < int, int> b)
+    return [position, n0](Edge a, Edge b)
     {
         if (a.first == b.first)
         {
             return position[a.second - n0 - 1] < position[b.second - n0 - 1];
         }
         return a.first < b.first;
+    };
+}
+
+auto make_average_comparison(vector<int> position, int n0){
+    return[position, n0](vector<int> a, vector<int> b)
+    {
+        int pos_a = 0, pos_b = 0;
+        for (int v: a){
+            pos_a += position[v - n0 - 1];   // size n1, 0 indexed     
+        }
+        pos_a /= a.size();
+        for (int v: b){
+            pos_b+= position[v - n0 - 1];   // size n1, 0 indexed     
+        }
+        pos_b /= b.size();
+        return a < b;
     };
 }
