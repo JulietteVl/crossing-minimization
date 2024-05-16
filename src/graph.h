@@ -16,6 +16,7 @@ class Graph{
         vector<int> order;              // the one we are working on at the moment, in the contracted graph.
         vector<int> best_order;         // in the contracted graph.
     public:
+        Graph();                        // expect std in
         Graph(string input_name);
         Graph(Graph graph, vector<vector<int>> contract_fixed, vector<vector<int>> contract_free);  // use node numbers
         Graph(Graph graph, vector<int> split_free);                        // split order (currently free only)
@@ -36,6 +37,51 @@ class Graph{
         void make_offset();
         void update_best();
 };
+
+Graph::Graph()
+{
+    string line;
+    int u, v, count = 0;  
+
+    while (getline(cin, line))
+    {
+        // Skip comment lines
+        if (line[0] == 'c')
+        {
+            continue;
+        }
+
+        // Parse p-line
+        else if (line[0] == 'p')
+        {
+            std::stringstream ss(line);
+            string p, ocr;
+            ss >> p >> ocr >> n0 >> n1 >> m;
+        }
+
+        else
+        {
+            // Read the edges
+            istringstream iss(line);
+            iss >> u >> v;
+            edges.push_back(Edge(u, v));
+            edges.push_back(Edge(v, u));
+            count++;
+            if (count >= m){
+                break;
+            }
+        }
+    }
+
+    // Compute offset array
+    sort(edges.begin(), edges.end());
+    make_offset();
+
+    // initialise order
+    order.resize(n1);
+    iota(order.begin(), order.end(), n0 + 1);
+    update_best();
+}
 
 Graph::Graph(string input_name)
 {
@@ -68,7 +114,6 @@ Graph::Graph(string input_name)
         else
         {
             // Read the edges
-            // TODO should I check for comments in the middle?
             istringstream iss(line);
             iss >> u >> v;
             edges.push_back(Edge(u, v));
@@ -154,27 +199,51 @@ void Graph::construct(Graph graph, vector<vector<int>> contract_fixed, vector<ve
     vector<int> placeholder(0);
     group.push_back(placeholder);   // sticking to 1-indexing, sadly
 
-    vector<int> replacement(graph.n0 + graph.n1 + 1);           // what vertex i is replaced by in the new graph
+    vector<int> replacement(graph.n0 + graph.n1 + 1);   // what vertex i is replaced by in the new graph
+                                                        // with respect to the input graph - not the original one.
+                                                        // used to make edges only
     int group_number = 1;
     // handle the groups
     for (auto subgroup: contract_fixed){
         for (int v: subgroup){
             replacement[v] = group_number;
         }
-        group.push_back(subgroup);
+        if (graph.group.empty()){
+            group.push_back(subgroup);
+        }
+        else{
+            vector<int> subgroup2;
+            for (int v: subgroup){
+                for (int u: graph.group[v]){
+                    subgroup2.push_back(u);
+                }
+            }
+            group.push_back(subgroup2);
+        }
         group_number ++;
     }
     for (auto subgroup: contract_free){
         for (int v: subgroup){
             replacement[v] = group_number;
         }
-        group.push_back(subgroup);
+        if (graph.group.empty()){
+            group.push_back(subgroup);
+        }
+        else{
+            vector<int> subgroup2;
+            for (int v: subgroup){
+                for (int u: graph.group[v]){
+                    subgroup2.push_back(u);
+                }
+            }
+            group.push_back(subgroup2);
+        }
         group_number ++;
     }
     // rename edges
     vector<Edge> edges_temp;
     for (Edge e: graph.edges){
-        Edge f(replacement[e.first], replacement[e.second]);
+        Edge f(replacement[e.first], replacement[e.second], e.weight);
         edges_temp.push_back(f);
     }
     sort(edges_temp.begin(), edges_temp.end());
