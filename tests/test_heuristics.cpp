@@ -53,11 +53,26 @@ TEST(example, test_count)
 TEST(example, test_contraction)
 {
     Graph G1("example_input.gr");
-    G1.barycenter_ordering();
     vector<vector<int>> fixed({{1, 2}});
     vector<vector<int>> free({{11, 10}});
     Graph G2(G1, fixed, free);
-    ASSERT_EQ(G1.crossing_count(), 3);
+    ASSERT_EQ(G2.crossing_count(), 10);
+}
+
+TEST(example, test_contraction_double)
+{
+    Graph G1("example_input.gr");
+    vector<vector<int>> fixed2({{1, 2}});
+    vector<vector<int>> free2({{10, 11}});
+    Graph G2(G1, fixed2, free2);
+    vector<vector<int>> fixed3({{1, 2}});
+    vector<vector<int>> free3({{8, 9}});
+    Graph G3(G2, fixed3, free3);
+    vector<vector<int>> fixed4({{1, 2, 3}});
+    vector<vector<int>> free4({{9, 10, 11}});
+    Graph G4(G1, fixed4, free4);
+    ASSERT_EQ(G3.group, G4.group);
+    ASSERT_EQ(G3.edges[1].weight, 4);
 }
 
 TEST(example, test_median_contraction)
