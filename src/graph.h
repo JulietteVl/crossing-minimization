@@ -13,14 +13,16 @@ class Graph{
         vector<int> crossings;
         vector<vector<int>> group;      // group[i]: original vertices contracted in i. Empty is there has been no contraction.
     protected:                          // orders need to be reconstructed if we have merged vertices
-        vector<int> order;              // the one we are working on at the moment, in the contracted graph.
-        vector<int> best_order;         // in the contracted graph.
+        vector<int> order;              // the one we are working on at the moment, in the contracted graph. 0 indexed
+        vector<int> best_order;         // in the contracted graph. 0 indexed
+        vector<vector<int>> adj;
     public:
         Graph();                        // expect std in
         Graph(string input_name);
         Graph(Graph graph, vector<vector<int>> contract_fixed, vector<vector<int>> contract_free);  // use node numbers
         Graph(Graph graph, vector<int> split_free);                        // split order (currently free only)
         ~Graph();
+        Graph get_copy_without_duplicates();
         void assign_order(vector<int> external_order);
         vector<int> get_order(){return reconstruct_order(order);}                   // in the original graph
         vector<int> get_best_order(){return reconstruct_order(best_order);}         // in the original graph
@@ -267,6 +269,31 @@ void Graph::construct(Graph graph, vector<vector<int>> contract_fixed, vector<ve
     update_best();
 }
 
+Graph Graph::get_copy_without_duplicates(){
+    if (adj.empty()){
+        adj.resize(n0 + n1 + 1);
+        for (Edge e: edges){
+            adj[e.first].push_back(e.second);
+        }
+    }
+    // we need the vertices to have been sorted with eg barycenter to proceed
+    vector<vector<int>> contract_fixed;
+    vector<vector<int>> contract_free;
+    int i = 0;
+    while (i < n1){
+        int j = 1;
+        vector<int> subgroup(1, order[i]);
+        while (i + j < n1 && adj[order[i]] == adj[order[i + j]]){
+            subgroup.push_back(order[i + j]);
+            j++;
+        }
+        i+=j;
+        contract_free.push_back(subgroup);
+    }
+    Graph G2(*this, contract_fixed, contract_free);
+    return G2;
+}
+
 // assumes the edges are sorted
 void Graph::make_offset(){
     offset.resize(n0 + n1 + 2, 0);
@@ -384,6 +411,7 @@ void Graph::median_ordering()
 {
     // return the free vertices ordered by the median of their neighbours.
     vector<pair<double, int>>median_position(n1);   // for sorting purposes, let us store the median and then the vertex number
+    vector<pair<double, int>>median_position_2(n1);
     order.resize(n1);
     int n_edges;
     int middle;
@@ -413,6 +441,15 @@ void Graph::median_ordering()
             median_position[i - n0 - 1] = make_pair(0, i);
         else
             median_position[i - n0 - 1] = make_pair(edges[middle].second, i);
+
+        // median version 2, performs better on some but not all examples
+        if (n_edges == 0)
+            median_position_2[i - n0 - 1] = make_pair(0, i);
+        else if ((n_edges % 2 == 1) || (edges[middle].weight > 1))
+            median_position_2[i - n0 - 1] = make_pair(edges[middle].second, i);
+        else{ // even number of edges AND edge of weight 1 (if weight > 1, the two original middle edges have been merged)
+            median_position_2[i - n0 - 1] = make_pair((edges[middle].second + edges[middle + 1].second)/2.0, i);
+        }  
     }
     sort(median_position.begin(), median_position.end());
     for (int i = 0; i < n1; i++)
@@ -421,27 +458,10 @@ void Graph::median_ordering()
     }
     update_best();
 
-    // median version 2, performs better on some but not all examples
-    if (!group.empty()){
-        return;
-    }
-    for (int i = n0 + 1; i <= n0 + n1; i++)
-    {   
-        n_edges = offset[i + 1] - offset[i];
-        middle = (offset[i] + offset[i + 1] - 1) / 2;
-
-        if (n_edges == 0)
-            median_position[i - n0 - 1] = make_pair(0, i);
-        else if ((n_edges % 2 == 1) || (edges[middle].weight > 1))
-            median_position[i - n0 - 1] = make_pair(edges[middle].second, i);
-        else{ // even number of edges AND edge of weight 1 (if weight > 1, the two original middle edges have been merged)
-            median_position[i - n0 - 1] = make_pair((edges[middle].second + edges[middle + 1].second)/2.0, i);
-        }  
-    }
-    sort(median_position.begin(), median_position.end());
+    sort(median_position_2.begin(), median_position_2.end());
     for (int i = 0; i < n1; i++)
     {
-        order[i] = median_position[i].second;
+        order[i] = median_position_2[i].second;
     }
     update_best();
 }

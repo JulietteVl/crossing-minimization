@@ -13,7 +13,7 @@ TEST(example, test_median)
 {
     Graph graph("example_input.gr");
     graph.median_ordering();
-    vector<int> order({9, 6, 10, 11, 7, 8});
+    vector<int> order({9, 6, 10, 11, 7, 12, 8});
     ASSERT_EQ(graph.get_best_order(), order);
 }
 
@@ -21,7 +21,7 @@ TEST(example, test_barycenter)
 {
     Graph graph("example_input.gr");
     graph.barycenter_ordering();
-    vector<int> order({9, 6, 11, 10, 7, 8});
+    vector<int> order({9, 6, 11, 10, 7, 12, 8});
     ASSERT_EQ(graph.get_order(), order);
 }
 
@@ -56,7 +56,7 @@ TEST(example, test_contraction)
     vector<vector<int>> fixed({{1, 2}});
     vector<vector<int>> free({{11, 10}});
     Graph G2(G1, fixed, free);
-    ASSERT_EQ(G2.crossing_count(), 10);
+    ASSERT_EQ(G2.crossing_count(), 11);
 }
 
 TEST(example, test_contraction_double)
@@ -93,7 +93,7 @@ TEST(example, test_contraction_count)
     vector<vector<int>> fixed({{1, 2}});
     vector<vector<int>> free({{11, 10}});
     Graph G2(G1, fixed, free);
-    ASSERT_EQ(G2.crossing_count(), 10);
+    ASSERT_EQ(G2.crossing_count(), 11);
 }
 
 TEST(example, test_position)

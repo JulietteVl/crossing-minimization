@@ -123,6 +123,6 @@ auto make_average_comparison(vector<int> position, int n0){
             pos_b+= position[v - n0 - 1];   // size n1, 0 indexed     
         }
         pos_b /= b.size();
-        return a < b;
+        return pos_a < pos_b;
     };
 }
