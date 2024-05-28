@@ -34,6 +34,7 @@ struct Edge{
 
 // segement tree
 
+vector<int> order_to_position(vector<int> order);
 vector<int> order_to_position(vector<int> order, int n0);
 int next_power_of_2(int v);
 void update(vector<int>& tree, int n, int k);
@@ -43,11 +44,18 @@ int sum(vector<int> tree, int n, int a, int b);
 
 auto make_comparison(vector<int> position, int n0);
 auto make_average_comparison(vector<int> position, int n0);
+float distance(vector<Edge> edges, vector<int> offset, int u, int v);
+float distance(vector<int> adj_u, vector<int> adj_v);
 
 
 
 // segment tree
 
+vector<int> order_to_position(vector<int> order){
+    auto iterator = min_element(order.begin(), order.end());
+    int n0 = *iterator;
+    return order_to_position(order, n0);
+}
 vector<int> order_to_position(vector<int> order, int n0){
     int n1 = order.size();
     vector<int> position(n1);
@@ -125,4 +133,37 @@ auto make_average_comparison(vector<int> position, int n0){
         pos_b /= b.size();
         return pos_a < pos_b;
     };
+}
+
+
+
+float distance(vector<Edge> edges, vector<int> offset, int u, int v){
+    vector<int> adj_u, adj_v;
+    // TODO compute lists
+    return distance(adj_u, adj_v);
+}
+
+// Assumes adj_u and adj_v are sorted.
+float distance(vector<int> adj_u, vector<int> adj_v){
+    int d = 0;
+    int y = adj_v[0];
+    for (int x: adj_u){
+        auto it = lower_bound(adj_v.begin(), adj_v.end(), x); // Iterator to the first element of the range [first, last) not ordered before value, or last if no such element is found. 
+        if (it == adj_v.end()){
+            d += x - adj_v.back();
+        }
+        else{
+            d += min(*it - x, x - *prev(it));
+        }
+    }
+    for (int x: adj_v){
+        auto it = lower_bound(adj_u.begin(), adj_u.end(), x); // Iterator to the first element of the range [first, last) not ordered before value, or last if no such element is found. 
+        if (it == adj_u.end()){
+            d += x - adj_u.back();
+        }
+        else{
+            d += min(*it - x, x - *prev(it));
+        }
+    }
+    return d;
 }

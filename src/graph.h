@@ -5,8 +5,9 @@ using namespace std;
 
 class Graph{
     public:
-        int n0, n1, m;
-        int best_crossing_count = INT_MAX;  // if the graph is contracted, this gives the crosssing count of the contracted vertices. currently edge weight is not taken into account
+        int m;
+        long int n0, n1;
+        long int best_crossing_count = INT_MAX;  // if the graph is contracted, this gives the crosssing count of the contracted vertices. currently edge weight is not taken into account
                                             // it seems useless to use anything but the crossing count in the original graph. TODO?
         vector<Edge> edges;             // size 2m, we store them in both directions. 
         vector<int> offset;             // size n0 + n1 + 2 (1-indexed as the nodes and we need 1 more)
@@ -18,6 +19,7 @@ class Graph{
         vector<vector<int>> adj;
     public:
         Graph();                        // expect std in
+        Graph(int m);                   // empty graph
         Graph(string input_name);
         Graph(Graph graph, vector<vector<int>> contract_fixed, vector<vector<int>> contract_free);  // use node numbers
         Graph(Graph graph, vector<int> split_free);                        // split order (currently free only)
@@ -83,6 +85,10 @@ Graph::Graph()
     order.resize(n1);
     iota(order.begin(), order.end(), n0 + 1);
     update_best();
+}
+
+Graph::Graph(int m){
+    m = m;
 }
 
 Graph::Graph(string input_name)
@@ -331,8 +337,24 @@ vector<int> Graph::reconstruct_order(vector<int> order_contracted){
     return order_full;
 }
 
+// the order must be either in the same graph or in the original graph.
+// Assumes that the vertices in the groups are consecutive in the given order
 void Graph::assign_order(vector<int> external_order){
-    order = external_order;
+    if (n1 == external_order.size()) 
+        order = external_order;
+    else{
+        vector<int> position = order_to_position(order);    // position between 1 and n1!
+        vector<pair<int, int>> group_position;
+        for (int i = n0 + 1; i <= n0 + n1; i++){
+            int v = group[i][0];
+            group_position.push_back(make_pair(position[v], i));
+        }
+        sort(group_position.begin(), group_position.end());
+        for (int i = 0; i < n1; i++)
+        {
+            order[i] = group_position[i].second;
+        }
+    }
     update_best();
 }
 
@@ -357,8 +379,12 @@ int Graph::crossing_count(){
 
 void Graph::compute_crossing_numbers(){
     // quadratic in the number of edges
-    crossings.resize(n1 * n1, 0);
-    int u, v;
+    long int max_size = crossings.max_size();
+    if (pow(n1, 2) > max_size){
+        return;
+    }
+    crossings.resize(pow(n1, 2), 0);
+    long int u, v;
     for (int i = 0;  i < m; i++){
         for (int j = i + 1;  j < m; j++){
             u = edges[i].second - n0 - 1;   // offset to have the right indices,
@@ -467,6 +493,9 @@ void Graph::median_ordering()
 }
 
 void Graph::greedy_ordering(){
+    if (n1*n1 > crossings.max_size()){
+        return;
+    }
     if (crossings.empty()){
         compute_crossing_numbers();
     }

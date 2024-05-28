@@ -21,3 +21,7 @@ for i in range(60):
         ratios[i, 1],
         ratios[i, 2]
     ))
+print("sum \t {:0.3f} \t {:0.3f}".format(
+    sum(ratios[:, 1]),
+    sum(ratios[:, 2])
+))
