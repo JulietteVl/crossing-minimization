@@ -53,7 +53,7 @@ float distance(vector<int> adj_u, vector<int> adj_v);
 
 vector<int> order_to_position(vector<int> order){
     auto iterator = min_element(order.begin(), order.end());
-    int n0 = *iterator;
+    int n0 = *iterator - 1;
     return order_to_position(order, n0);
 }
 vector<int> order_to_position(vector<int> order, int n0){

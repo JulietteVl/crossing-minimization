@@ -343,10 +343,10 @@ void Graph::assign_order(vector<int> external_order){
     if (n1 == external_order.size()) 
         order = external_order;
     else{
-        vector<int> position = order_to_position(order);    // position between 1 and n1!
+        vector<int> position = order_to_position(external_order);    // position between 1 and n1!
         vector<pair<int, int>> group_position;
         for (int i = n0 + 1; i <= n0 + n1; i++){
-            int v = group[i][0];
+            int v = group[i][0] - n0 - 1;
             group_position.push_back(make_pair(position[v], i));
         }
         sort(group_position.begin(), group_position.end());
