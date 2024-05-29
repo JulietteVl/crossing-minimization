@@ -90,7 +90,7 @@ int pipeline(int argc, char **argv)
 
 
     // Output
-    cout << graph.best_crossing_count << endl; // just to know
+    // cout << graph.best_crossing_count << endl; // just to know
     ofstream output_file(output_name);
 
     if (!output_file.is_open()) {
