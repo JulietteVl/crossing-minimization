@@ -17,6 +17,7 @@ void term(int signum)
     {
         cout << v << endl;
     }
+    exit(0);
 }
 
 int pipeline(int argc, char **argv)

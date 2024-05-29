@@ -447,6 +447,9 @@ void Graph::median_ordering()
 }
 
 void Graph::greedy_ordering(){
+    if (n1*n1 > crossings.max_size()){
+        return;
+    }
     if (crossings.empty()){
         compute_crossing_numbers();
     }
