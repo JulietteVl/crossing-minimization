@@ -48,9 +48,8 @@ int pipeline(int argc, char **argv)
 
     graph.barycenter_ordering();
     graph.greedy_ordering();
-
-    // Test contraction
     order = graph.get_best_order();
+    
     // Recursive contraction
     int s = graph.n1 / 2;
     vector<int> split_free({s});
