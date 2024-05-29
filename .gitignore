@@ -1,6 +1,7 @@
 build/*
 *.out
 *.txt
+*.sol
 sol/*
 *.ipynb
 .vscode
