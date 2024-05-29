@@ -25,5 +25,5 @@ jobs:
 
     - name: Assess performance
       working-directory: ${{github.workspace}}
-      run: ./crossing_counts.sh && python crossing_counts_sort.py < crossing_counts.txt
+      run: ./crossing_counts.sh && pip install numpy && python crossing_counts_sort.py < crossing_counts.txt
 
