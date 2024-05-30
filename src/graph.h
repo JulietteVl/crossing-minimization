@@ -5,8 +5,9 @@ using namespace std;
 
 class Graph{
     public:
-        int n0, n1, m;
-        int best_crossing_count = INT_MAX;  // if the graph is contracted, this gives the crosssing count of the contracted vertices. currently edge weight is not taken into account
+        long int n0, n1;
+        int m;
+        long int best_crossing_count = INT_MAX;  // if the graph is contracted, this gives the crosssing count of the contracted vertices. currently edge weight is not taken into account
                                             // it seems useless to use anything but the crossing count in the original graph. TODO?
         vector<Edge> edges;             // size 2m, we store them in both directions. 
         vector<int> offset;             // size n0 + n1 + 2 (1-indexed as the nodes and we need 1 more)
@@ -30,7 +31,7 @@ class Graph{
         void barycenter_ordering();
         void median_ordering();
         // local heuristic
-        void greedy_ordering();
+        void greedy_ordering(int max_size);
     private:
         void construct(Graph graph, vector<vector<int>> contract_fixed, vector<vector<int>> contract_free);
         vector<int> reconstruct_order(vector<int> order_contracted);
@@ -446,11 +447,14 @@ void Graph::median_ordering()
     update_best();
 }
 
-void Graph::greedy_ordering(){
+void Graph::greedy_ordering(int max_size){
+    if (pow(n1, 2) > crossings.max_size() || pow(n1, 2) > max_size){
+        return;
+    }
     if (crossings.empty()){
         compute_crossing_numbers();
     }
-    int u, v;
+    long int u, v;
     int temp, i = 0, j = 1; // we look at two vertices of consecutive positions i, j
     while(j < n1){
         u = order[i] - n0 - 1;

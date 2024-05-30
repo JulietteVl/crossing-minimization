@@ -1,5 +1,6 @@
 build/*
 *.out
+*.sol
 *.txt
 sol/*
 *.ipynb

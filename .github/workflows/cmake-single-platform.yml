@@ -25,5 +25,5 @@ jobs:
 
     - name: Assess performance
       working-directory: ${{github.workspace}}
-      run: pip install pip install pace2024-verifier && ./crossing_counts.sh && pip install numpy && python crossing_counts_sort.py < crossing_counts.txt
+      run: pip install pace2024-verifier && pip install numpy && ./crossing_counts.sh && python crossing_counts_sort.py < crossing_counts.txt
 
