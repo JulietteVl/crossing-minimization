@@ -15,7 +15,7 @@ TBA
 ## LICENSE
 [![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](http://badges.mit-license.org)
 
-# For developers
+## For developers
 To run the tests locally, in the test folder run:
 ```
 g++ -o test.out test_heuristics.cpp -lgtest -lgtest_main -pthread && ./test.out
