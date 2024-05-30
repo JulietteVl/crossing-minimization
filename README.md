@@ -5,12 +5,14 @@ To use the heuristics, compile (i.e `g++ src/main.cpp`) and run:
 path/to/excecutable input > output
 ```
 
-# Requirements
+## Requirements
 No external library should be necessary.
+Built with C++ 17.
 
-# DOI
+## DOI
+TBA
 
-# LICENSE
+## LICENSE
 [![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](http://badges.mit-license.org)
 
 # For developers
