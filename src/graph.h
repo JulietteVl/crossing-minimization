@@ -31,7 +31,7 @@ class Graph{
         void barycenter_ordering();
         void median_ordering();
         // local heuristic
-        void greedy_ordering();
+        void greedy_ordering(int max_size);
     private:
         void construct(Graph graph, vector<vector<int>> contract_fixed, vector<vector<int>> contract_free);
         vector<int> reconstruct_order(vector<int> order_contracted);
@@ -447,8 +447,8 @@ void Graph::median_ordering()
     update_best();
 }
 
-void Graph::greedy_ordering(){
-    if (pow(n1, 2) > crossings.max_size()){
+void Graph::greedy_ordering(int max_size){
+    if (pow(n1, 2) > crossings.max_size() || pow(n1, 2) > max_size){
         return;
     }
     if (crossings.empty()){

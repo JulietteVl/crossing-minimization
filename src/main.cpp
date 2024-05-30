@@ -47,9 +47,9 @@ int pipeline(int argc, char **argv)
     graph.assign_order(order);
 
     graph.barycenter_ordering();
-    graph.greedy_ordering();
+    graph.greedy_ordering(2*pow(10, 9));
     order = graph.get_best_order();
-    
+
     // Recursive contraction
     int s = graph.n1 / 2;
     vector<int> split_free({s});
@@ -62,7 +62,7 @@ int pipeline(int argc, char **argv)
             split_free.push_back(s);
         }
         Graph G2(graph, split_free);
-        G2.greedy_ordering();
+        G2.greedy_ordering(2*pow(10, 9));
         order = G2.get_best_order();
         graph.assign_order(order);
     }
