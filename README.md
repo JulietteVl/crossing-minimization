@@ -13,7 +13,7 @@ Built with C++ 17.
 TBA
 
 ## LICENSE
-[![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](http://badges.mit-license.org)
+[![License](http://img.shields.io/:license-BSD--3--Clause-blue.svg?style=flat-square)](https://opensource.org/license/BSD-3-clause)
 
 ## For developers
 To run the tests locally, run the following in the `tests` folder:
