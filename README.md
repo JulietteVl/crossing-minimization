@@ -10,7 +10,7 @@ No external library should be necessary.
 Built with C++ 17.
 
 ## DOI
-TBA
+https://zenodo.org/doi/10.5281/zenodo.11400797
 
 ## LICENSE
 [![License](http://img.shields.io/:license-BSD--3--Clause-blue.svg?style=flat-square)](https://opensource.org/license/BSD-3-clause)
