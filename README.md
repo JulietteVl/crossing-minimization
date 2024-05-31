@@ -1,4 +1,6 @@
 # 1-Sided Crossing minimization
+[![DOI](http://img.shields.io/:DOI-10.5281/zenodo.11400797-blue)](https://zenodo.org/doi/10.5281/zenodo.11400797)
+[![License](http://img.shields.io/:license-BSD--3--Clause-blue)](https://opensource.org/license/BSD-3-clause)
 ## How to use
 To use the heuristics, compile (i.e `g++ src/main.cpp`) and run:
 ```
@@ -8,12 +10,6 @@ path/to/excecutable input > output
 ## Requirements
 No external library should be necessary.
 Built with C++ 17.
-
-## DOI
-https://zenodo.org/doi/10.5281/zenodo.11400797
-
-## LICENSE
-[![License](http://img.shields.io/:license-BSD--3--Clause-blue.svg?style=flat-square)](https://opensource.org/license/BSD-3-clause)
 
 ## For developers
 To run the tests locally, run the following in the `tests` folder:
