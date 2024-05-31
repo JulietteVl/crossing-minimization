@@ -1,6 +1,6 @@
 ## Evaluate the score on the medium set
 
-g++ src/main.cpp
+g++ ../src/main.cpp
 truncate -s 0 crossing_counts.txt
 truncate -s 0 sol.sol
 
