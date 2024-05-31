@@ -1,6 +1,8 @@
 # 1-Sided Crossing minimization
 [![DOI](http://img.shields.io/:DOI-10.5281/zenodo.11400797-blue)](https://zenodo.org/doi/10.5281/zenodo.11400797)
 [![License](http://img.shields.io/:license-BSD--3--Clause-blue)](https://opensource.org/license/BSD-3-clause)
+[![Tests](https://github.com/JulietteVl/crossing-minimization/actions/workflows/cmake-single-platform.yml/badge.svg)](https://github.com/JulietteVl/crossing-minimization/actions/workflows/cmake-single-platform.yml)
+
 ## How to use
 To use the heuristics, compile (i.e `g++ src/main.cpp`) and run:
 ```
