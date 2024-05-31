@@ -16,13 +16,13 @@ TBA
 [![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](http://badges.mit-license.org)
 
 ## For developers
-To run the tests locally, in the test folder run:
+To run the tests locally, run the following in the `tests` folder:
 ```
 g++ -o test.out test_heuristics.cpp -lgtest -lgtest_main -pthread && ./test.out
 ```
 This requires Google test.
 
-To assess performance on the medium test set, in the default folder run:
+To assess performance on the medium test set, run the following in the `tests` folder:
 ```
 ./crossing_counts.sh && python crossing_counts_sort.py < crossing_counts.txt
 ```
