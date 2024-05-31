@@ -1,11 +1,7 @@
 build/*
 *.out
-*.sol
 *.txt
-sol/*
-*.ipynb
 .vscode
-pace_env/
 src/.ipynb_checkpoints/*
 visualizer.py
 

@@ -24,6 +24,6 @@ jobs:
       run: ctest -C ${{env.BUILD_TYPE}}
 
     - name: Assess performance
-      working-directory: ${{github.workspace}}
+      working-directory: ${{github.workspace}}/tests
       run: pip install pace2024-verifier && pip install numpy && ./crossing_counts.sh && python crossing_counts_sort.py < crossing_counts.txt
 
