@@ -13,7 +13,7 @@ for i in range(60):
 rank = np.argsort(data[:, 1])
 
 data = data[rank]
-print(time[0])
+
 print("graph \t ratio \t time")
 for i in range(60):
     print("{}.gr \t {:0.4f} \t {:0.2f}s".format(
@@ -21,6 +21,6 @@ for i in range(60):
         data[i, 1],
         time[i],
     ))
-print("sum \t {:0.3f}\t {:0.2f}".format(
+print("sum \t {:0.3f} \t {:0.2f}".format(
     sum(data[:, 1]), sum(time)
 ))

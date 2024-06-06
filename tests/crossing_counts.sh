@@ -13,7 +13,6 @@ do
     python -c "print($duration)" >> crossing_counts.txt
 done
 
-start=$(date +%s.%N);
 for i in `seq 1 60 `
 do
     # provided solution
@@ -21,9 +20,7 @@ do
     # our algo
     ./a.out medium_test_set/instances/$i.gr > medium_test_set/test/$i.sol
     my_crossings=$(pace2024verifier -c medium_test_set/instances/$i.gr medium_test_set/test/$i.sol)
-    python -c "print($my_crossings/$pc_crossings)" >> crossing_counts.txt
+    python -c "print($pc_crossings/$my_crossings)" >> crossing_counts.txt
     python -c "print($my_crossings)" >> crossing_counts.txt
 
 done
-duration=$(echo "$(date +%s.%N) - $start" | bc)
-printf "Execution time: %.1f seconds" $duration
