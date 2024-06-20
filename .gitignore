@@ -1,5 +1,6 @@
 build/*
 *.out
+*.sol
 *.txt
 .vscode
 src/.ipynb_checkpoints/*
