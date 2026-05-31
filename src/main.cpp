@@ -43,12 +43,13 @@ int pipeline(int argc, char **argv)
     // Apply some algorithm to the input - we keep the best result
 
     graph.median_ordering();
-    order = graph.get_best_order();
-    graph.assign_order(order);
-
+    graph.greedy_ordering(2*pow(10, 9));
+    
     graph.barycenter_ordering();
     graph.greedy_ordering(2*pow(10, 9));
+
     order = graph.get_best_order();
+    graph.assign_order(order);
 
     // Recursive contraction
     int s = graph.n1 / 2;

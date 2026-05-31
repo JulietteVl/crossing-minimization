@@ -5,6 +5,7 @@ build/*
 .vscode
 src/.ipynb_checkpoints/*
 visualizer.py
+pace_venv/*
 
 crossing_counts_instances.sh
 crossing_counts_test.sh
@@ -12,3 +13,8 @@ instances_heuristic/
 sol.sol
 src/sol.sol
 src/submission.cpp
+
+*.sh
+*.py
+
+tests/medium_test_set/test/*

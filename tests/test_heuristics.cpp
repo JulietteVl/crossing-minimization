@@ -5,7 +5,7 @@ TEST(example, test_greedy)
 {
     Graph graph("example_input.gr");
     graph.compute_crossing_numbers();
-    graph.greedy_ordering();
+    graph.greedy_ordering(2*pow(10, 9));
     ASSERT_EQ(graph.crossing_count(), 3);
 }
 
